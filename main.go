@@ -36,6 +36,7 @@ func main() {
 		log.Fatal("Can't connect to database:", err)
 	}
 
+	apiCfg := apiConfig{}
 	router := chi.NewRouter()
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
