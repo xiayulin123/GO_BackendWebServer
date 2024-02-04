@@ -36,7 +36,10 @@ func main() {
 		log.Fatal("Can't connect to database:", err)
 	}
 
-	apiCfg := apiConfig{}
+	apiCfg := apiConfig{
+		DB: database.New(connected),
+	}
+
 	router := chi.NewRouter()
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
@@ -51,15 +54,18 @@ func main() {
 
 	v1Router.Get("/healthz", handlerReadiness)
 	v1Router.Get("/err", handlerErr)
+	v1Router.Post("/users", apiCfg.handlerCreateUser)
+	v1Router.Get("/users", apiCfg.handlerGetUserByAPIKEY)
 
 	router.Mount("/v1", v1Router)
+
 	server := &http.Server{
 		Handler: router,
 		Addr:    ":" + port,
 	}
 
 	log.Printf("Server starting on port %v", port)
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
 	}
